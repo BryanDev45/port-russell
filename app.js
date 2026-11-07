@@ -14,6 +14,10 @@ app.get('/', (req, res) => {
 
 // Toutes les routes qui commencent par /catways sont gérées par routes/catways.js
 app.use('/catways', require('./routes/catways'));
+// Les réservations sont aussi sous /catways (/catways/:id/reservations)
+app.use('/catways', require('./routes/reservations'));
+
+app.use('/users', require('./routes/users'));
 
 const PORT = process.env.PORT || 3000;
 // On démarre le serveur seulement une fois connecté à la base
