@@ -3,13 +3,11 @@ const Reservation = require('../models/reservation');
 
 /**
  * Liste les réservations d'un catway (GET /catways/:id/reservations).
- * @type {import('express').RequestHandler}
  */
 async function getAllReservations(req, res) {
   if (isNaN(req.params.id)) {
     return res.status(400).json({ message: 'Le numéro de catway doit être un nombre' });
   }
-  // On vérifie d'abord que le catway existe
   if (!(await Catway.exists({ catwayNumber: req.params.id }))) {
     return res.status(404).json({ message: 'Catway introuvable' });
   }
@@ -19,13 +17,11 @@ async function getAllReservations(req, res) {
 
 /**
  * Renvoie une réservation d'un catway (GET /catways/:id/reservations/:idReservation).
- * @type {import('express').RequestHandler}
  */
 async function getReservation(req, res) {
   if (isNaN(req.params.id)) {
     return res.status(400).json({ message: 'Le numéro de catway doit être un nombre' });
   }
-  // _id n'est pas toujours valide (ex : "abc") : Mongoose lèverait alors une erreur
   if (!mongooseIdIsValid(req.params.idReservation)) {
     return res.status(400).json({ message: 'Identifiant de réservation invalide' });
   }
@@ -40,13 +36,11 @@ async function getReservation(req, res) {
 }
 
 /**
- * Vérifie qu'aucune autre réservation n'occupe le catway sur la période demandée.
- * Deux périodes se chevauchent si l'une commence avant la fin de l'autre
- * ET se termine après le début de l'autre.
+ * Vérifie qu'aucune autre réservation n'occupe le catway sur la période.
  * @param {number} catwayNumber Numéro du catway
- * @param {Date} startDate Début de la période demandée
- * @param {Date} endDate Fin de la période demandée
- * @param {string} [ignoreId] Réservation à ignorer (utile pour une modification)
+ * @param {Date} startDate Début de la période
+ * @param {Date} endDate Fin de la période
+ * @param {string} [ignoreId] Réservation à ignorer (modification)
  * @returns {Promise<boolean>} true si le catway est libre
  */
 async function isFree(catwayNumber, startDate, endDate, ignoreId) {
@@ -56,15 +50,14 @@ async function isFree(catwayNumber, startDate, endDate, ignoreId) {
     endDate: { $gt: startDate }
   };
   if (ignoreId) {
-    filter._id = { $ne: ignoreId }; // on ne compare pas la réservation avec elle-même
+    filter._id = { $ne: ignoreId };
   }
   const count = await Reservation.countDocuments(filter);
   return count === 0;
 }
 
 /**
- * Crée une réservation pour un catway (POST /catways/:id/reservations).
- * @type {import('express').RequestHandler}
+ * Crée une réservation (POST /catways/:id/reservations).
  */
 async function createReservation(req, res) {
   if (isNaN(req.params.id)) {
@@ -76,10 +69,10 @@ async function createReservation(req, res) {
   try {
     const { clientName, boatName, startDate, endDate } = req.body;
     const reservation = new Reservation({
-      catwayNumber: req.params.id, // le numéro vient de l'URL, pas du corps
+      catwayNumber: req.params.id,
       clientName, boatName, startDate, endDate
     });
-    await reservation.validate(); // vérifie les champs et les dates
+    await reservation.validate();
     if (!(await isFree(reservation.catwayNumber, reservation.startDate, reservation.endDate))) {
       return res.status(400).json({ message: 'Ce catway est déjà réservé sur cette période' });
     }
@@ -92,7 +85,6 @@ async function createReservation(req, res) {
 
 /**
  * Modifie une réservation (PUT /catways/:id/reservations/:idReservation).
- * @type {import('express').RequestHandler}
  */
 async function updateReservation(req, res) {
   if (isNaN(req.params.id)) {
@@ -109,7 +101,6 @@ async function updateReservation(req, res) {
     return res.status(404).json({ message: 'Réservation introuvable' });
   }
   try {
-    // On remplace les champs modifiables (le catway ne change pas)
     const { clientName, boatName, startDate, endDate } = req.body;
     reservation.set({ clientName, boatName, startDate, endDate });
     await reservation.validate();
@@ -125,7 +116,6 @@ async function updateReservation(req, res) {
 
 /**
  * Supprime une réservation (DELETE /catways/:id/reservations/:idReservation).
- * @type {import('express').RequestHandler}
  */
 async function deleteReservation(req, res) {
   if (isNaN(req.params.id)) {
@@ -145,7 +135,7 @@ async function deleteReservation(req, res) {
 }
 
 /**
- * Vérifie qu'un texte a la forme d'un identifiant MongoDB (24 caractères hexadécimaux).
+ * Vérifie qu'un texte a la forme d'un identifiant MongoDB.
  * @param {string} id
  * @returns {boolean}
  */

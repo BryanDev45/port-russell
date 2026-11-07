@@ -1,26 +1,30 @@
 require('dotenv').config();
 const express = require('express');
+const session = require('express-session');
 const connectDB = require('./config/db');
+const { isAuthenticated } = require('./middlewares/auth');
 
 const app = express();
 
-// Pour lire le JSON envoyé dans le corps des requêtes
 app.use(express.json());
 
-// Première route pour vérifier que le serveur fonctionne
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'secret-de-developpement',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 1000 * 60 * 60 * 8 }
+}));
+
 app.get('/', (req, res) => {
   res.send('API du port de plaisance Russell');
 });
 
-// Toutes les routes qui commencent par /catways sont gérées par routes/catways.js
-app.use('/catways', require('./routes/catways'));
-// Les réservations sont aussi sous /catways (/catways/:id/reservations)
-app.use('/catways', require('./routes/reservations'));
-
-app.use('/users', require('./routes/users'));
+app.use('/', require('./routes/auth'));
+app.use('/catways', isAuthenticated, require('./routes/catways'));
+app.use('/catways', isAuthenticated, require('./routes/reservations'));
+app.use('/users', isAuthenticated, require('./routes/users'));
 
 const PORT = process.env.PORT || 3000;
-// On démarre le serveur seulement une fois connecté à la base
 connectDB().then(() => {
   app.listen(PORT, () => {
     console.log(`Serveur démarré sur http://localhost:${PORT}`);

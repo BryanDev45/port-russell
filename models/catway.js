@@ -1,10 +1,7 @@
 const mongoose = require('mongoose');
 
 /**
- * @typedef {Object} Catway
- * @property {number} catwayNumber Numéro du catway (unique)
- * @property {string} catwayType   Type : "long" ou "short"
- * @property {string} catwayState  Description de l'état de la passerelle
+ * Schéma d'un catway : numéro unique, type (long ou short) et état.
  */
 const catwaySchema = new mongoose.Schema({
   catwayNumber: {

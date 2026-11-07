@@ -1,8 +1,7 @@
 const Catway = require('../models/catway');
 
 /**
- * Renvoie la liste de tous les catways (GET /catways).
- * @type {import('express').RequestHandler}
+ * Liste tous les catways (GET /catways).
  */
 async function getAllCatways(req, res) {
   const catways = await Catway.find().sort({ catwayNumber: 1 });
@@ -11,10 +10,8 @@ async function getAllCatways(req, res) {
 
 /**
  * Renvoie un catway grâce à son numéro (GET /catways/:id).
- * @type {import('express').RequestHandler}
  */
 async function getCatway(req, res) {
-  // Le numéro doit être un nombre, sinon MongoDB renvoie une erreur
   if (isNaN(req.params.id)) {
     return res.status(400).json({ message: 'Le numéro de catway doit être un nombre' });
   }
@@ -27,7 +24,6 @@ async function getCatway(req, res) {
 
 /**
  * Crée un catway (POST /catways).
- * @type {import('express').RequestHandler}
  */
 async function createCatway(req, res) {
   try {
@@ -35,7 +31,6 @@ async function createCatway(req, res) {
     const catway = await Catway.create({ catwayNumber, catwayType, catwayState });
     res.status(201).json(catway);
   } catch (err) {
-    // 11000 = numéro déjà utilisé (champ unique)
     if (err.code === 11000) {
       return res.status(400).json({ message: 'Ce numéro de catway existe déjà' });
     }
@@ -45,8 +40,6 @@ async function createCatway(req, res) {
 
 /**
  * Modifie l'état d'un catway (PUT /catways/:id).
- * Le numéro et le type ne sont pas modifiables : seul catwayState est lu.
- * @type {import('express').RequestHandler}
  */
 async function updateCatway(req, res) {
   if (isNaN(req.params.id)) {
@@ -56,7 +49,7 @@ async function updateCatway(req, res) {
     const catway = await Catway.findOneAndUpdate(
       { catwayNumber: req.params.id },
       { catwayState: req.body.catwayState },
-      { new: true, runValidators: true } // new : renvoie la version modifiée
+      { new: true, runValidators: true }
     );
     if (!catway) {
       return res.status(404).json({ message: 'Catway introuvable' });
@@ -69,7 +62,6 @@ async function updateCatway(req, res) {
 
 /**
  * Supprime un catway (DELETE /catways/:id).
- * @type {import('express').RequestHandler}
  */
 async function deleteCatway(req, res) {
   if (isNaN(req.params.id)) {
