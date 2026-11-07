@@ -12,6 +12,9 @@ app.get('/', (req, res) => {
   res.send('API du port de plaisance Russell');
 });
 
+// Toutes les routes qui commencent par /catways sont gérées par routes/catways.js
+app.use('/catways', require('./routes/catways'));
+
 const PORT = process.env.PORT || 3000;
 // On démarre le serveur seulement une fois connecté à la base
 connectDB().then(() => {
