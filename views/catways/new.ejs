@@ -1,0 +1,26 @@
+<%- include('../partials/header') %>
+
+<div class="container">
+  <h1>Nouveau catway</h1>
+  <form action="/catways" method="POST">
+    <label for="catwayNumber">Numéro</label>
+    <input type="number" id="catwayNumber" name="catwayNumber" min="1" required>
+
+    <label for="catwayType">Type</label>
+    <select id="catwayType" name="catwayType" required>
+      <option value="short">short</option>
+      <option value="long">long</option>
+    </select>
+
+    <label for="catwayState">État</label>
+    <input type="text" id="catwayState" name="catwayState" required>
+
+    <div class="row">
+      <button type="submit">Créer</button>
+      <a class="delete-button" href="/catways">Annuler</a>
+    </div>
+  </form>
+ 
+</div>
+
+<%- include('../partials/footer') %>

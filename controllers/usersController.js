@@ -1,10 +1,14 @@
 const User = require('../models/user');
+const { isBrowser, fail } = require('../utils/helpers');
 
 /**
  * Liste les utilisateurs (GET /users).
  */
 async function getAllUsers(req, res) {
   const users = await User.find().sort({ username: 1 });
+  if (isBrowser(req)) {
+    return res.render('users/index', { title: 'Utilisateurs', users });
+  }
   res.json(users);
 }
 
@@ -12,11 +16,32 @@ async function getAllUsers(req, res) {
  * Renvoie un utilisateur grâce à son email (GET /users/:email).
  */
 async function getUser(req, res) {
-  const user = await User.findOne({ email: req.params.email.toLowerCase() });
-  if (!user) {
-    return res.status(404).json({ message: 'Utilisateur introuvable' });
+  const found = await User.findOne({ email: req.params.email.toLowerCase() });
+  if (!found) {
+    return fail(req, res, 404, 'Utilisateur introuvable', '/users');
   }
-  res.json(user);
+  if (isBrowser(req)) {
+    return res.render('users/show', { title: found.username, userDetail: found });
+  }
+  res.json(found);
+}
+
+/**
+ * Affiche le formulaire de création (GET /users/new).
+ */
+function showNewForm(req, res) {
+  res.render('users/new', { title: 'Nouvel utilisateur' });
+}
+
+/**
+ * Affiche le formulaire de modification (GET /users/:email/edit).
+ */
+async function showEditForm(req, res) {
+  const found = await User.findOne({ email: req.params.email.toLowerCase() });
+  if (!found) {
+    return fail(req, res, 404, 'Utilisateur introuvable', '/users');
+  }
+  res.render('users/edit', { title: `Modifier ${found.username}`, userDetail: found });
 }
 
 /**
@@ -25,13 +50,15 @@ async function getUser(req, res) {
 async function createUser(req, res) {
   try {
     const { username, email, password } = req.body;
-    const user = await User.create({ username, email, password });
-    res.status(201).json(user);
-  } catch (err) {
-    if (err.code === 11000) {
-      return res.status(400).json({ message: 'Cet email est déjà utilisé' });
+    const created = await User.create({ username, email, password });
+    if (isBrowser(req)) {
+      req.session.message = { type: 'success', text: 'Utilisateur créé' };
+      return res.redirect('/users');
     }
-    res.status(400).json({ message: err.message });
+    res.status(201).json(created);
+  } catch (err) {
+    const text = err.code === 11000 ? 'Cet email est déjà utilisé' : err.message;
+    fail(req, res, 400, text, '/users/new');
   }
 }
 
@@ -39,22 +66,28 @@ async function createUser(req, res) {
  * Modifie un utilisateur (PUT /users/:email).
  */
 async function updateUser(req, res) {
-  const user = await User.findOne({ email: req.params.email.toLowerCase() });
-  if (!user) {
-    return res.status(404).json({ message: 'Utilisateur introuvable' });
+  const found = await User.findOne({ email: req.params.email.toLowerCase() });
+  if (!found) {
+    return fail(req, res, 404, 'Utilisateur introuvable', '/users');
   }
   try {
     const { username, email, password } = req.body;
-    if (username) user.username = username;
-    if (email) user.email = email;
-    if (password) user.password = password;
-    await user.save();
-    res.json(user);
-  } catch (err) {
-    if (err.code === 11000) {
-      return res.status(400).json({ message: 'Cet email est déjà utilisé' });
+    if (username) found.username = username;
+    if (email) found.email = email;
+    if (password) found.password = password;
+    await found.save();
+
+    if (req.session.user.email === req.params.email.toLowerCase()) {
+      req.session.user = { username: found.username, email: found.email };
     }
-    res.status(400).json({ message: err.message });
+    if (isBrowser(req)) {
+      req.session.message = { type: 'success', text: 'Utilisateur modifié' };
+      return res.redirect('/users');
+    }
+    res.json(found);
+  } catch (err) {
+    const text = err.code === 11000 ? 'Cet email est déjà utilisé' : err.message;
+    fail(req, res, 400, text, `/users/${encodeURIComponent(req.params.email)}/edit`);
   }
 }
 
@@ -62,11 +95,21 @@ async function updateUser(req, res) {
  * Supprime un utilisateur (DELETE /users/:email).
  */
 async function deleteUser(req, res) {
-  const user = await User.findOneAndDelete({ email: req.params.email.toLowerCase() });
-  if (!user) {
-    return res.status(404).json({ message: 'Utilisateur introuvable' });
+  const email = req.params.email.toLowerCase();
+  if (req.session.user.email === email) {
+    return fail(req, res, 400, 'Vous ne pouvez pas supprimer votre propre compte', '/users');
+  }
+  const deleted = await User.findOneAndDelete({ email });
+  if (!deleted) {
+    return fail(req, res, 404, 'Utilisateur introuvable', '/users');
+  }
+  if (isBrowser(req)) {
+    req.session.message = { type: 'success', text: 'Utilisateur supprimé' };
+    return res.redirect('/users');
   }
   res.json({ message: 'Utilisateur supprimé' });
 }
 
-module.exports = { getAllUsers, getUser, createUser, updateUser, deleteUser };
+module.exports = {
+  getAllUsers, getUser, showNewForm, showEditForm, createUser, updateUser, deleteUser
+};

@@ -1,0 +1,19 @@
+<%- include('../partials/header') %>
+
+<div class="container">
+  <h1>Réservation</h1>
+  <ul>
+    <li>Catway : <%= reservation.catwayNumber %></li>
+    <li>Client : <%= reservation.clientName %></li>
+    <li>Bateau : <%= reservation.boatName %></li>
+    <li>Début : <%= reservation.startDate.toLocaleDateString('fr-FR') %></li>
+    <li>Fin : <%= reservation.endDate.toLocaleDateString('fr-FR') %></li>
+  </ul>
+
+  <p>
+    <a class="tbl-buttons" href="/catways/<%= reservation.catwayNumber %>/reservations/<%= reservation._id %>/edit">Modifier</a>
+    <a class="tbl-buttons" href="/reservations">Retour à la liste</a>
+  </p>
+</div>
+
+<%- include('../partials/footer') %>

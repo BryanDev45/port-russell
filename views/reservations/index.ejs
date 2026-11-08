@@ -1,0 +1,50 @@
+<%- include('../partials/header') %>
+
+<div class="container">
+  <h1><%= title %></h1>
+  <p>
+    <% if (catwayNumber) { %>
+      <a href="/catways/<%= catwayNumber %>/reservations/new">+ Nouvelle réservation</a>
+      <a href="/reservations">Toutes les réservations</a>
+    <% } else { %>
+      <a class="tbl-buttons" href="/reservations/new">+ Nouvelle réservation</a>
+    <% } %>
+  </p>
+
+  <% if (reservations.length === 0) { %>
+    <p>Aucune réservation.</p>
+  <% } else { %>
+    <table>
+      <thead>
+        <tr>
+          <th>Catway</th>
+          <th>Client</th>
+          <th>Bateau</th>
+          <th>Début</th>
+          <th>Fin</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% reservations.forEach(function (r) { %>
+          <tr>
+            <td><%= r.catwayNumber %></td>
+            <td><%= r.clientName %></td>
+            <td><%= r.boatName %></td>
+            <td><%= r.startDate.toLocaleDateString('fr-FR') %></td>
+            <td><%= r.endDate.toLocaleDateString('fr-FR') %></td>
+            <td>
+              <a class="tbl-buttons" href="/catways/<%= r.catwayNumber %>/reservations/<%= r._id %>">Détails</a>
+              <a class="tbl-buttons" href="/catways/<%= r.catwayNumber %>/reservations/<%= r._id %>/edit">Modifier</a>
+              <form class="inline" action="/catways/<%= r.catwayNumber %>/reservations/<%= r._id %>?_method=DELETE" method="POST" onsubmit="return confirm('Supprimer cette réservation ?')">
+                <button class="delete-button" type="submit">Supprimer</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>

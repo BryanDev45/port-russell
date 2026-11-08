@@ -1,0 +1,46 @@
+<%- include('../partials/header') %>
+
+<div class="container">
+  <h1>Nouvelle réservation</h1>
+  <form id="reservation-form" method="POST">
+    <label for="catwayNumber">Catway</label>
+    <select id="catwayNumber" required>
+      <% catways.forEach(function (c) { %>
+        <option value="<%= c.catwayNumber %>" <%= String(c.catwayNumber) === String(selected) ? 'selected' : '' %>>
+          <%= c.catwayNumber %> (<%= c.catwayType %>)
+        </option>
+      <% }) %>
+    </select>
+
+    <label for="clientName">Nom du client</label>
+    <input type="text" id="clientName" name="clientName" required>
+
+    <label for="boatName">Nom du bateau</label>
+    <input type="text" id="boatName" name="boatName" required>
+
+    <label for="startDate">Date de début</label>
+    <input type="date" id="startDate" name="startDate" required>
+
+    <label for="endDate">Date de fin</label>
+    <input type="date" id="endDate" name="endDate" required>
+
+    <div class="row">
+      <button type="submit">Réserver</button>
+      <a class="delete-button" href="/reservations">Annuler</a>
+    </div>
+  </form>
+</div>
+
+<script>
+  const form = document.getElementById('reservation-form');
+  const select = document.getElementById('catwayNumber');
+
+  function updateAction() {
+    form.action = '/catways/' + select.value + '/reservations';
+  }
+
+  select.addEventListener('change', updateAction);
+  updateAction();
+</script>
+
+<%- include('../partials/footer') %>

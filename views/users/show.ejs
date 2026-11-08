@@ -1,0 +1,15 @@
+<%- include('../partials/header') %>
+
+<div class="container">
+  <h1><%= userDetail.username %></h1>
+  <ul>
+    <li>Email : <%= userDetail.email %></li>
+  </ul>
+
+  <p>
+    <a class="tbl-buttons" href="/users/<%= encodeURIComponent(userDetail.email) %>/edit">Modifier</a>
+    <a class="tbl-buttons" href="/users">Retour à la liste</a>
+  </p>
+</div>
+
+<%- include('../partials/footer') %>

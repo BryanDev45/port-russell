@@ -1,0 +1,18 @@
+<%- include('../partials/header') %>
+
+<div class="container">
+  <h1>Modifier le catway <%= catway.catwayNumber %></h1>
+  <p>Type : <%= catway.catwayType %> (le numéro et le type ne sont pas modifiables)</p>
+
+  <form action="/catways/<%= catway.catwayNumber %>?_method=PUT" method="POST">
+    <label for="catwayState">État</label>
+    <input type="text" id="catwayState" name="catwayState" value="<%= catway.catwayState %>" required>
+
+    <div class="row">
+      <button type="submit">Enregistrer</button>
+      <a class="delete-button" href="/catways">Annuler</a>
+    </div>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>

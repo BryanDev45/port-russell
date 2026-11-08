@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %> - Port Russell</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header>
+  <a class="brand" href="/">Port Russell</a>
+  <% if (user) { %>
+  <nav>
+    <a class="link-header" href="/dashboard">Tableau de bord</a>
+    <a class="link-header" href="/catways">Catways</a>
+    <a class="link-header" href="/reservations">Réservations</a>
+    <a class="link-header" href="/users">Utilisateurs</a>
+    <a class="link-header" href="/api-docs">Documentation API</a>
+    <a class="link-header" href="/logout">Déconnexion</a>
+  </nav>
+  <% } %>
+</header>
+<main>
+<% if (message) { %>
+  <p class="message <%= message.type %>"><%= message.text %></p>
+<% } %>

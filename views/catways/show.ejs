@@ -1,0 +1,16 @@
+<%- include('../partials/header') %>
+
+<div class="container">
+  <h1>Catway <%= catway.catwayNumber %></h1>
+  <ul>
+    <li>Type : <%= catway.catwayType %></li>
+    <li>État : <%= catway.catwayState %></li>
+  </ul>
+
+  <p>
+    <a class="tbl-buttons" href="/catways/<%= catway.catwayNumber %>/edit">Modifier</a>
+    <a class="tbl-buttons" href="/catways">Retour à la liste</a>
+  </p>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,34 @@
+<%- include('../partials/header') %>
+<div class="container">
+  <h1>Catways</h1>
+  <p><a class="tbl-buttons" href="/catways/new">+ Nouveau catway</a></p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Numéro</th>
+        <th>Type</th>
+        <th>État</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% catways.forEach(function (c) { %>
+        <tr>
+          <td><%= c.catwayNumber %></td>
+          <td><%= c.catwayType %></td>
+          <td><%= c.catwayState %></td>
+          <td>
+            <a class="tbl-buttons" href="/catways/<%= c.catwayNumber %>">Détails</a>
+            <a class="tbl-buttons" href="/catways/<%= c.catwayNumber %>/edit">Modifier</a>
+            <form class="inline" action="/catways/<%= c.catwayNumber %>?_method=DELETE" method="POST" onsubmit="return confirm('Supprimer ce catway ?')">
+              <button class="delete-button" type="submit">Supprimer</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<%- include('../partials/footer') %>

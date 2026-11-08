@@ -1,0 +1,33 @@
+<%- include('../partials/header') %>
+
+<div class="container">
+  <h1>Utilisateurs</h1>
+  <p><a class="tbl-buttons" href="/users/new">+ Nouvel utilisateur</a></p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Nom</th>
+        <th>Email</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% users.forEach(function (u) { %>
+        <tr>
+          <td><%= u.username %></td>
+          <td><%= u.email %></td>
+          <td>
+            <a class="tbl-buttons" href="/users/<%= encodeURIComponent(u.email) %>">Détails</a>
+            <a class="tbl-buttons" href="/users/<%= encodeURIComponent(u.email) %>/edit">Modifier</a>
+            <form class="inline" action="/users/<%= encodeURIComponent(u.email) %>?_method=DELETE" method="POST" onsubmit="return confirm('Supprimer cet utilisateur ?')">
+              <button class="delete-button" type="submit">Supprimer</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,27 @@
+<%- include('partials/header') %>
+
+<div class="connexion-form">
+  <div class="container">
+    <h1>Port de plaisance Russell</h1>
+    <p>Application de la capitainerie pour gérer les catways, les réservations et les utilisateurs.</p>
+    <p><a href="/api-docs">Documentation de l'API</a></p>
+  </div>
+
+  <div class="container">
+    <h2>Connexion</h2>
+    <% if (error) { %>
+      <p class="error"><%= error %></p>
+    <% } %>
+    <form action="/login" method="POST">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="password">Mot de passe</label>
+      <input type="password" id="password" name="password" required>
+
+      <button type="submit">Se connecter</button>
+    </form>
+  </div>
+</div>
+<%- include('partials/footer') %>
+    
