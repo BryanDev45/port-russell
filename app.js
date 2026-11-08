@@ -3,6 +3,8 @@ const path = require('path');
 const express = require('express');
 const session = require('express-session');
 const methodOverride = require('method-override');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swagger');
 const connectDB = require('./config/db');
 const { isAuthenticated } = require('./middlewares/auth');
 
@@ -33,6 +35,8 @@ app.use((req, res, next) => {
   delete req.session.message;
   next();
 });
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use('/', require('./routes/pages'));
 app.use('/', require('./routes/auth'));
