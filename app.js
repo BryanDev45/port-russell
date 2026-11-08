@@ -9,6 +9,11 @@ const connectDB = require('./config/db');
 const { isAuthenticated } = require('./middlewares/auth');
 
 const app = express();
+const isProduction = process.env.NODE_ENV === 'production';
+
+if (isProduction) {
+  app.set('trust proxy', 1);
+}
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -25,7 +30,8 @@ app.use(session({
   cookie: {
     maxAge: 1000 * 60 * 60 * 8,
     httpOnly: true,
-    sameSite: 'lax'
+    sameSite: 'lax',
+    secure: isProduction
   }
 }));
 
